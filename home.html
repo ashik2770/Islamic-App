@@ -224,14 +224,16 @@
             onValue(forbiddenRef, (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
-                    document.getElementById("forbidden-dawn").textContent = `${to12Hour(data.dawn.start)} - ${to12Hour(data.dawn.end)}`;
-                    document.getElementById(" opposition-noon").textContent = `${to12Hour(data.noon.start)} - ${to12Hour(data.noon.end)}`;
-                    document.getElementById("forbidden-evening").textContent = `${to12Hour(data.evening.start)} - ${to12Hour(data.evening.end)}`;
+                    document.getElementById("forbidden-dawn").textContent = data.dawn ? `${to12Hour(data.dawn.start)} - ${to12Hour(data.dawn.end)}` : "ডেটা নেই";
+                    document.getElementById("forbidden-noon").textContent = data.noon ? `${to12Hour(data.noon.start)} - ${to12Hour(data.noon.end)}` : "ডেটা নেই";
+                    document.getElementById("forbidden-evening").textContent = data.evening ? `${to12Hour(data.evening.start)} - ${to12Hour(data.evening.end)}` : "ডেটা নেই";
                 } else {
                     document.getElementById("forbidden-dawn").textContent = "ডেটা নেই";
                     document.getElementById("forbidden-noon").textContent = "ডেটা নেই";
                     document.getElementById("forbidden-evening").textContent = "ডেটা নেই";
                 }
+            }, (error) => {
+                console.error("Forbidden times load error:", error);
             });
         }
 
@@ -281,5 +283,5 @@
             });
         }
     </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'91f23b7afc48456c',t:'MTc0MTc3MTQwMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

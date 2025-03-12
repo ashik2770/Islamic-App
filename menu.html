@@ -76,8 +76,8 @@
             </div>
 
             <div class="bg-gray-800 p-4 rounded-xl shadow-lg col-span-2 transform hover:scale-[1.02] transition-transform">
-                <h2 class="text-lg font-bold text-emerald-400 mb-2">দিনের দোয়া</h2>
-                <p id="dua-of-day" class="text-base">লোড হচ্ছে...</p>
+                <h2 class="text-lg font-bold text-emerald-400 mb-2">আজকের হাদিস</h2>
+                <p id="hadith-of-day" class="text-base italic text-gray-200">লোড হচ্ছে...</p>
             </div>
 
             <div class="bg-gray-800 p-4 rounded-xl shadow-lg col-span-2 transform hover:scale-[1.02] transition-transform">
@@ -85,9 +85,12 @@
                 <div id="prayer-progress" class="space-y-3"></div>
             </div>
 
-            <div class="bg-gray-800 p-4 rounded-xl shadow-lg col-span-2 transform hover:scale-[1.02] transition-transform">
-                <h2 class="text-lg font-bold text-emerald-400 mb-2">ইসলামিক টিপস</h2>
-                <p id="islamic-tip" class="text-base">লোড হচ্ছে...</p>
+            <div class="bg-gray-800 p-4 rounded-xl shadow-lg col-span-2 transform hover:scale-[1.02] transition-transform relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-br from-emerald-900/20 to-transparent pointer-events-none"></div>
+                <h2 class="text-lg font-bold text-emerald-400 mb-3 relative z-10">ইসলামিক টিপস</h2>
+                <div class="relative z-10 bg-gray-700/50 p-3 rounded-lg border-l-4 border-emerald-500">
+                    <p id="islamic-tip" class="text-base text-gray-200 leading-relaxed">লোড হচ্ছে...</p>
+                </div>
             </div>
         </div>
     </div>
@@ -316,20 +319,23 @@
             });
         });
 
-        function loadDuaOfDay() {
-            const duaRef = ref(database, "duas");
-            onValue(duaRef, (snapshot) => {
-                const duas = snapshot.val();
-                if (duas) {
-                    const duaKeys = Object.keys(duas);
+        function loadHadithOfDay() {
+            const hadithRef = ref(database, "hadiths"); // Assuming a "hadiths" node in Firebase
+            onValue(hadithRef, (snapshot) => {
+                const hadiths = snapshot.val();
+                if (hadiths) {
+                    const hadithKeys = Object.keys(hadiths);
                     const today = new Date().getDate();
-                    const duaKey = duaKeys[today % duaKeys.length];
-                    const duaContent = duas[duaKey].content;
-                    document.getElementById("dua-of-day").textContent = duaContent;
-                    localStorage.setItem("duaOfDay", duaContent);
+                    const hadithKey = hadithKeys[today % hadithKeys.length];
+                    const hadithContent = hadiths[hadithKey].content || "হাদিস পাওয়া যায়নি";
+                    document.getElementById("hadith-of-day").textContent = hadithContent;
+                    localStorage.setItem("hadithOfDay", hadithContent);
                 } else {
-                    document.getElementById("dua-of-day").textContent = localStorage.getItem("duaOfDay") || "দোয়া লোড করা যায়নি";
+                    document.getElementById("hadith-of-day").textContent = localStorage.getItem("hadithOfDay") || "হাদিস লোড করা যায়নি";
                 }
+            }, (error) => {
+                console.error("Hadith fetch error:", error);
+                document.getElementById("hadith-of-day").textContent = "হাদিস লোড করতে ত্রুটি হয়েছে";
             });
         }
 
@@ -365,19 +371,22 @@
                     const tipKeys = Object.keys(tips);
                     const today = new Date().getDate();
                     const tipKey = tipKeys[today % tipKeys.length];
-                    const tipContent = tips[tipKey].content;
+                    const tipContent = tips[tipKey].content || "টিপস পাওয়া যায়নি";
                     document.getElementById("islamic-tip").textContent = tipContent;
                     localStorage.setItem("islamicTip", tipContent);
                 } else {
                     document.getElementById("islamic-tip").textContent = localStorage.getItem("islamicTip") || "টিপস লোড করা যায়নি";
                 }
+            }, (error) => {
+                console.error("Tips fetch error:", error);
+                document.getElementById("islamic-tip").textContent = "টিপস লোড করতে ত্রুটি হয়েছে";
             });
         }
 
         document.addEventListener("DOMContentLoaded", async () => {
             await loadPrayerAlarms();
             await loadSehriAlarm();
-            loadDuaOfDay();
+            loadHadithOfDay();
             loadIslamicTips();
             updateCompass();
         });

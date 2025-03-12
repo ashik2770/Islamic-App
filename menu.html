@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#111827">
+    <meta name="description" content="ইসলামিক লাইফ - মেনু">
+    <title>ইসলামিক লাইফ - মেনু</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/favicon.ico">
+</head>
+<body class="bg-gray-900 text-white min-h-screen font-sans">
+    <div class="max-w-md mx-auto p-4">
+        <header class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold text-emerald-400">মেনু</h1>
+            <a href="notifications.html" id="notification-btn" class="p-2 relative">
+                <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+                <span id="notification-count" class="absolute top-0 right-0 bg-red-500 text-xs rounded-full w-4 h-4 flex items-center justify-center hidden">0</span>
+            </a>
+        </header>
+
+        <div class="grid grid-cols-2 gap-4 mb-16">
+            <div class="bg-gray-800 p-4 rounded-xl shadow-lg transform hover:scale-105 transition-transform">
+                <h2 class="text-lg font-bold text-emerald-400 mb-2">তাসবিহ</h2>
+                <div class="flex items-center justify-between">
+                    <span id="tasbih-count" class="text-3xl font-bold">0</span>
+                    <button id="tasbih-increment" class="bg-emerald-600 p-2 rounded-full hover:bg-emerald-700 transition">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16zm-1-11h2v4h-2zm0 6h2v2h-2z" />
+                        </svg>
+                    </button>
+                </div>
+                <button id="tasbih-reset" class="mt-2 text-sm text-gray-400 hover:text-emerald-400">রিসেট</button>
+            </div>
+
+            <div class="bg-gray-800 p-4 rounded-xl shadow-lg transform hover:scale-105 transition-transform">
+                <h2 class="text-lg font-bold text-emerald-400 mb-2">কিবলা কম্পাস</h2>
+                <div class="relative w-32 h-32 mx-auto">
+                    <div id="compass" class="w-full h-full rounded-full border-4 border-emerald-400 flex items-center justify-center transition-transform duration-100" style="background: radial-gradient(circle, #1f2937, #111827);">
+                        <svg class="w-8 h-8 text-emerald-400 absolute top-4" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                        </svg>
+                        <span class="text-sm font-semibold text-gray-200 absolute bottom-4">কিবলা</span>
+                    </div>
+                </div>
+                <p id="compass-status" class="text-center mt-2 text-xs text-gray-400">কিবলা খুঁজছে...</p>
+            </div>
+
+            <div class="bg-gray-800 p-4 rounded-xl shadow-lg col-span-2 transform hover:scale-[1.02] transition-transform">
+                <h2 class="text-lg font-bold text-emerald-400 mb-2">নামাজের অ্যালার্ম</h2>
+                <div id="prayer-alarms" class="space-y-3"></div>
+            </div>
+
+            <div class="bg-gray-800 p-4 rounded-xl shadow-lg transform hover:scale-105 transition-transform">
+                <h2 class="text-lg font-bold text-emerald-400 mb-2">সাহরী অ্যালার্ম</h2>
+                <div class="flex items-center justify-between">
+                    <span id="sehri-time" class="text-base">লোড হচ্ছে...</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="sehri-alarm" class="sr-only peer">
+                        <div class="w-11 h-6 bg-gray-600 rounded-full peer-checked:bg-emerald-600 transition duration-200"></div>
+                        <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform duration-200 transform peer-checked:translate-x-5"></div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="bg-gray-800 p-4 rounded-xl shadow-lg transform hover:scale-105 transition-transform">
+                <a href="#" id="nearby-mosque" class="flex flex-col items-center hover:text-emerald-400 transition">
+                    <svg class="w-6 h-6 text-emerald-400 mb-2" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5 14.5 7.62 14.5 9 13.38 11.5 12 11.5z" />
+                    </svg>
+                    <span class="text-base font-semibold">পার্শ্ববর্তী মসজিদ</span>
+                </a>
+            </div>
+
+            <div class="bg-gray-800 p-4 rounded-xl shadow-lg col-span-2 transform hover:scale-[1.02] transition-transform">
+                <h2 class="text-lg font-bold text-emerald-400 mb-2">দিনের দোয়া</h2>
+                <p id="dua-of-day" class="text-base">লোড হচ্ছে...</p>
+            </div>
+
+            <div class="bg-gray-800 p-4 rounded-xl shadow-lg col-span-2 transform hover:scale-[1.02] transition-transform">
+                <h2 class="text-lg font-bold text-emerald-400 mb-2">নামাজের অগ্রগতি</h2>
+                <div id="prayer-progress" class="space-y-3"></div>
+            </div>
+
+            <div class="bg-gray-800 p-4 rounded-xl shadow-lg col-span-2 transform hover:scale-[1.02] transition-transform">
+                <h2 class="text-lg font-bold text-emerald-400 mb-2">ইসলামিক টিপস</h2>
+                <p id="islamic-tip" class="text-base">লোড হচ্ছে...</p>
+            </div>
+        </div>
+    </div>
+
+    <nav class="fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-emerald-500 py-2 shadow-lg">
+        <div class="max-w-md mx-auto flex justify-around">
+            <a href="index.html" class="p-2 text-gray-400 hover:text-emerald-400 transition">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5v-5l-10 5-10-5v5z" />
+                </svg>
+                <span class="text-xs">হোম</span>
+            </a>
+            <a href="calendar.html" class="p-2 text-gray-400 hover:text-emerald-400 transition">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                </svg>
+                <span class="text-xs">ক্যালেন্ডার</span>
+            </a>
+            <a href="quran.html" class="p-2 text-gray-400 hover:text-emerald-400 transition">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z" />
+                </svg>
+                <span class="text-xs">কুরআন</span>
+            </a>
+            <a href="dua.html" class="p-2 text-gray-400 hover:text-emerald-400 transition">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
+                </svg>
+                <span class="text-xs">দোয়া</span>
+            </a>
+            <a href="menu.html" class="p-2 text-emerald-400">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" />
+                </svg>
+                <span class="text-xs">মেনু</span>
+            </a>
+        </div>
+    </nav>
+
+    <style>
+        .bg-gray-800 { background: linear-gradient(135deg, #1f2937 0%, #111827 100%); }
+        .shadow-lg { box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.1), 0 4px 6px -2px rgba(16, 185, 129, 0.05); }
+        #compass { transition: transform 0.1s ease-out; }
+    </style>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDrfoR60PDZP1Jo3rdq9hA3i6ZSFCBnFug",
+            authDomain: "muslim-web-app.firebaseapp.com",
+            databaseURL: "https://muslim-web-app-default-rtdb.firebaseio.com",
+            projectId: "muslim-web-app",
+            storageBucket: "muslim-web-app.firebasestorage.app",
+            messagingSenderId: "575010521833",
+            appId: "1:575010521833:web:7ad541405854bf51106678",
+            measurementId: "G-MEYHG9F7E4"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        let count = localStorage.getItem("tasbihCount") || 0;
+        const tasbihCount = document.getElementById("tasbih-count");
+        tasbihCount.textContent = count;
+        document.getElementById("tasbih-increment").addEventListener("click", () => {
+            count++;
+            tasbihCount.textContent = count;
+            localStorage.setItem("tasbihCount", count);
+        });
+        document.getElementById("tasbih-reset").addEventListener("click", () => {
+            count = 0;
+            tasbihCount.textContent = count;
+            localStorage.setItem("tasbihCount", count);
+        });
+
+        let qiblaAngle = 0;
+        async function updateCompass() {
+            const compass = document.getElementById("compass");
+            const status = document.getElementById("compass-status");
+
+            if (navigator.geolocation) {
+                navigator.geolocation.watchPosition((position) => {
+                    const qiblaLat = 21.4225;
+                    const qiblaLon = 39.8262;
+                    const userLat = position.coords.latitude;
+                    const userLon = position.coords.longitude;
+                    qiblaAngle = calculateQiblaAngle(userLat, userLon, qiblaLat, qiblaLon);
+                    status.textContent = "কিবলা নির্দেশিত";
+                    updateCompassWithOrientation();
+                }, (error) => {
+                    status.textContent = `জিওলোকেশন ত্রুটি: ${error.message}`;
+                }, { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 });
+            } else {
+                status.textContent = "জিওলোকেশন সমর্থিত নয়";
+            }
+
+            if (window.DeviceOrientationEvent) {
+                window.addEventListener("deviceorientation", handleOrientation, true);
+            } else {
+                status.textContent = "ডিভাইস ওরিয়েন্টেশন সমর্থিত নয়";
+            }
+
+            function handleOrientation(event) {
+                const alpha = event.alpha || 0;
+                const adjustedAngle = qiblaAngle - alpha;
+                compass.style.transform = `rotate(${adjustedAngle}deg)`;
+            }
+        }
+
+        function calculateQiblaAngle(lat1, lon1, lat2, lon2) {
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            lat1 = lat1 * Math.PI / 180;
+            lat2 = lat2 * Math.PI / 180;
+            const y = Math.sin(dLon) * Math.cos(lat2);
+            const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
+            return Math.atan2(y, x) * 180 / Math.PI;
+        }
+
+        function updateCompassWithOrientation() {
+            const compass = document.getElementById("compass");
+            compass.style.transform = `rotate(${qiblaAngle}deg)`;
+        }
+
+        async function fetchPrayerTimes(city) {
+            try {
+                const response = await fetch(`http://api.aladhan.com/v1/timingsByCity?city=${city}&country=Bangladesh&method=4`);
+                const data = await response.json();
+                const timings = data.data.timings;
+                localStorage.setItem("prayerTimings", JSON.stringify(timings));
+                return timings;
+            } catch (error) {
+                console.error("নামাজের সময় ফেচ ত্রুটি:", error);
+                return JSON.parse(localStorage.getItem("prayerTimings")) || null;
+            }
+        }
+
+        async function loadPrayerAlarms() {
+            const prayerAlarmsDiv = document.getElementById("prayer-alarms");
+            const city = localStorage.getItem("selectedCity") || "Dhaka";
+            let timings = await fetchPrayerTimes(city);
+            if (!timings) {
+                prayerAlarmsDiv.innerHTML = "<p class='text-red-500'>নামাজের সময় লোড করা যায়নি</p>";
+                return;
+            }
+            const prayers = [
+                { name: "ফজর", time: timings.Fajr, id: "fajr-alarm" },
+                { name: "যোহর", time: timings.Dhuhr, id: "dhuhr-alarm" },
+                { name: "আসর", time: timings.Asr, id: "asr-alarm" },
+                { name: "মাগরিব", time: timings.Maghrib, id: "maghrib-alarm" },
+                { name: "ইশা", time: timings.Isha, id: "isha-alarm" }
+            ];
+            prayerAlarmsDiv.innerHTML = "";
+            prayers.forEach(prayer => {
+                const div = document.createElement("div");
+                div.className = "flex items-center justify-between";
+                div.innerHTML = `
+                    <span class="text-base">${prayer.name} - ${prayer.time}</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="${prayer.id}" class="sr-only peer" ${localStorage.getItem(prayer.id) === "true" ? "checked" : ""}>
+                        <div class="w-11 h-6 bg-gray-600 rounded-full peer-checked:bg-emerald-600 transition duration-200"></div>
+                        <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform duration-200 transform peer-checked:translate-x-5"></div>
+                    </label>
+                `;
+                prayerAlarmsDiv.appendChild(div);
+                setupAlarm(prayer.id, prayer.time, prayer.name === "ফজর");
+            });
+            loadPrayerProgress(timings);
+        }
+
+        async function loadSehriAlarm() {
+            const city = localStorage.getItem("selectedCity") || "Dhaka";
+            let sehriTime = localStorage.getItem("sehriTime");
+            if (!sehriTime) {
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                const response = await fetch(`http://api.aladhan.com/v1/timingsByCity?city=${city}&country=Bangladesh&method=4&date=${tomorrow.toISOString().split("T")[0]}`);
+                const data = await response.json();
+                const fajrTime = data.data.timings.Fajr;
+                const [hours, minutes] = fajrTime.split(":").map(Number);
+                const sehriAlarmTime = new Date(tomorrow);
+                sehriAlarmTime.setHours(hours - 1, minutes, 0, 0);
+                sehriTime = `${String(sehriAlarmTime.getHours()).padStart(2, "0")}:${String(sehriAlarmTime.getMinutes()).padStart(2, "0")}`;
+                localStorage.setItem("sehriTime", sehriTime);
+            }
+            document.getElementById("sehri-time").textContent = sehriTime;
+            document.getElementById("sehri-alarm").checked = localStorage.getItem("sehri-alarm") === "true";
+            setupAlarm("sehri-alarm", sehriTime, false);
+        }
+
+        function setupAlarm(alarmId, time, isFajr) {
+            const checkbox = document.getElementById(alarmId);
+            checkbox.addEventListener("change", () => {
+                localStorage.setItem(alarmId, checkbox.checked);
+                if (checkbox.checked) scheduleAlarm(alarmId, time, isFajr);
+            });
+            if (checkbox.checked) scheduleAlarm(alarmId, time, isFajr);
+        }
+
+        function scheduleAlarm(alarmId, time, isFajr) {
+            const [hours, minutes] = time.split(":").map(Number);
+            const now = new Date();
+            const alarmTime = new Date(now);
+            alarmTime.setHours(hours, minutes, 0, 0);
+            if (alarmTime < now) alarmTime.setDate(alarmTime.getDate() + 1);
+            const timeDiff = alarmTime - now;
+            if (timeDiff > 0) {
+                setTimeout(() => {
+                    const audioUrl = isFajr ? "https://cdn.aladhan.com/audio/adhans/a2.mp3" : "https://cdn.aladhan.com/audio/adhans/a2.mp3";
+                    const audio = new Audio(audioUrl);
+                    audio.play().catch(err => console.error("আজান চালাতে ত্রুটি:", err));
+                    alert(`${alarmId.replace("-alarm", "")} এর সময় হয়েছে!`);
+                }, timeDiff);
+            }
+        }
+
+        document.getElementById("nearby-mosque").addEventListener("click", (e) => {
+            e.preventDefault();
+            navigator.geolocation.getCurrentPosition((position) => {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                window.location.href = `https://www.google.com/maps/search/মসজিদ+near+me/@${lat},${lon},14z`;
+            }, () => {
+                window.location.href = "https://www.google.com/maps/search/মসজিদ+near+me";
+            });
+        });
+
+        function loadDuaOfDay() {
+            const duaRef = ref(database, "duas");
+            onValue(duaRef, (snapshot) => {
+                const duas = snapshot.val();
+                if (duas) {
+                    const duaKeys = Object.keys(duas);
+                    const today = new Date().getDate();
+                    const duaKey = duaKeys[today % duaKeys.length];
+                    const duaContent = duas[duaKey].content;
+                    document.getElementById("dua-of-day").textContent = duaContent;
+                    localStorage.setItem("duaOfDay", duaContent);
+                } else {
+                    document.getElementById("dua-of-day").textContent = localStorage.getItem("duaOfDay") || "দোয়া লোড করা যায়নি";
+                }
+            });
+        }
+
+        function loadPrayerProgress(timings) {
+            const progressDiv = document.getElementById("prayer-progress");
+            const prayers = [
+                { name: "ফজর", key: "Fajr" },
+                { name: "যোহর", key: "Dhuhr" },
+                { name: "আসর", key: "Asr" },
+                { name: "মাগরিব", key: "Maghrib" },
+                { name: "ইশা", key: "Isha" }
+            ];
+            progressDiv.innerHTML = "";
+            prayers.forEach(prayer => {
+                const div = document.createElement("div");
+                div.className = "flex items-center justify-between";
+                div.innerHTML = `
+                    <span class="text-base">${prayer.name}</span>
+                    <input type="checkbox" id="${prayer.key}-progress" class="w-5 h-5 border-2 border-emerald-400 rounded accent-emerald-600" ${localStorage.getItem(`${prayer.key}-done`) === "true" ? "checked" : ""}>
+                `;
+                progressDiv.appendChild(div);
+                document.getElementById(`${prayer.key}-progress`).addEventListener("change", (e) => {
+                    localStorage.setItem(`${prayer.key}-done`, e.target.checked);
+                });
+            });
+        }
+
+        function loadIslamicTips() {
+            const tipsRef = ref(database, "tips");
+            onValue(tipsRef, (snapshot) => {
+                const tips = snapshot.val();
+                if (tips) {
+                    const tipKeys = Object.keys(tips);
+                    const today = new Date().getDate();
+                    const tipKey = tipKeys[today % tipKeys.length];
+                    const tipContent = tips[tipKey].content;
+                    document.getElementById("islamic-tip").textContent = tipContent;
+                    localStorage.setItem("islamicTip", tipContent);
+                } else {
+                    document.getElementById("islamic-tip").textContent = localStorage.getItem("islamicTip") || "টিপস লোড করা যায়নি";
+                }
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            await loadPrayerAlarms();
+            await loadSehriAlarm();
+            loadDuaOfDay();
+            loadIslamicTips();
+            updateCompass();
+        });
+
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker.register("/sw.js").then(() => {
+                    console.log("Service Worker registered");
+                }).catch(err => {
+                    console.error("Service Worker registration failed:", err);
+                });
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#111827">
+    <meta name="description" content="Islamic Life - দোয়া সমূহ">
+    <title>Islamic Life - দোয়া</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/favicon.ico">
+</head>
+<body class="bg-gray-900 text-white min-h-screen font-sans">
+    <div class="max-w-md mx-auto p-4">
+        <header class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold text-emerald-400">দোয়া</h1>
+            <a href="notifications.html" id="notification-btn" class="p-2 relative">
+                <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+                <span id="notification-count" class="absolute top-0 right-0 bg-red-500 text-xs rounded-full w-4 h-4 flex items-center justify-center hidden">0</span>
+            </a>
+        </header>
+
+        <div class="mb-6">
+            <input type="text" id="search-bar" placeholder="দোয়া খুঁজুন..." class="w-full bg-gray-800 border border-emerald-500 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400">
+        </div>
+
+        <div class="flex overflow-x-auto space-x-4 mb-6 pb-2" id="dua-names">
+            <!-- Dua names will be dynamically added here -->
+        </div>
+
+        <div id="dua-list" class="space-y-4 mb-16">
+            <p id="loading-text" class="text-gray-400 text-center">লোড হচ্ছে...</p>
+        </div>
+    </div>
+
+    <nav class="fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-emerald-500 py-2">
+        <div class="max-w-md mx-auto flex justify-around">
+            <a href="home.html" class="p-2 text-gray-400">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5v-5l-10 5-10-5v5z" />
+                </svg>
+                <span class="text-xs">হোম</span>
+            </a>
+            <a href="calendar.html" class="p-2 text-gray-400">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                </svg>
+                <span class="text-xs">ক্যালেন্ডার</span>
+            </a>
+            <a href="quran.html" class="p-2 text-gray-400">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
+                </svg>
+                <span class="text-xs">কুরআন</span>
+            </a>
+            <a href="dua.html" class="p-2 text-emerald-400">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
+                </svg>
+                <span class="text-xs">দোয়া</span>
+            </a>
+            <a href="menu.html" class="p-2 text-gray-400">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" />
+                </svg>
+                <span class="text-xs">মেনু</span>
+            </a>
+        </div>
+    </nav>
+
+    <style>
+        .bg-gray-800 {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+        }
+        .shadow-lg {
+            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.1), 0 4px 6px -2px rgba(16, 185, 129, 0.05);
+        }
+        .dua-card {
+            transition: transform 0.2s;
+        }
+        .dua-card:hover {
+            transform: scale(1.02);
+        }
+    </style>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDrfoR60PDZP1Jo3rdq9hA3i6ZSFCBnFug",
+            authDomain: "muslim-web-app.firebaseapp.com",
+            databaseURL: "https://muslim-web-app-default-rtdb.firebaseio.com",
+            projectId: "muslim-web-app",
+            storageBucket: "muslim-web-app.firebasestorage.app",
+            messagingSenderId: "575010521833",
+            appId: "1:575010521833:web:7ad541405854bf51106678",
+            measurementId: "G-MEYHG9F7E4"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        function loadDuaNames() {
+            const duaNamesDiv = document.getElementById("dua-names");
+            const duasRef = ref(database, "duas");
+
+            onValue(duasRef, (snapshot) => {
+                duaNamesDiv.innerHTML = "";
+                const duas = snapshot.val();
+                if (duas) {
+                    Object.entries(duas).forEach(([key, value]) => {
+                        const title = value.title || key;
+                        const button = document.createElement("button");
+                        button.className = "bg-gray-800 p-4 rounded-xl shadow-lg text-center hover:bg-emerald-600 transition duration-300 flex-shrink-0 w-32";
+                        button.id = key;
+                        button.innerHTML = `<span class="text-base font-semibold">${title}</span>`;
+                        button.addEventListener("click", () => displaySelectedDua(key));
+                        duaNamesDiv.appendChild(button);
+                    });
+                } else {
+                    duaNamesDiv.innerHTML = "<p class='text-gray-400'>কোনো দোয়া পাওয়া যায়নি</p>";
+                }
+            });
+        }
+
+        function displaySelectedDua(duaKey) {
+            const duaListDiv = document.getElementById("dua-list");
+            const duaRef = ref(database, `duas/${duaKey}`);
+            onValue(duaRef, (snapshot) => {
+                const duaData = snapshot.val();
+                if (duaData) {
+                    const existingCard = document.querySelector(`#dua-card-${duaKey}`);
+                    if (!existingCard) {
+                        const duaCard = document.createElement("div");
+                        duaCard.id = `dua-card-${duaKey}`;
+                        duaCard.className = "dua-card bg-gray-800 p-4 rounded-xl shadow-lg";
+                        duaCard.innerHTML = `
+                            <h3 class="text-lg font-bold text-emerald-400 mb-2">${duaData.title}</h3>
+                            <p class="text-base">${duaData.content || "দোয়া পাওয়া যায়নি"}</p>
+                        `;
+                        duaListDiv.prepend(duaCard);
+                        window.scrollTo({ top: duaCard.offsetTop, behavior: "smooth" });
+                    }
+                }
+            }, { onlyOnce: true });
+        }
+
+        function loadAllDuas(searchQuery = "") {
+            const duaListDiv = document.getElementById("dua-list");
+            const loadingText = document.getElementById("loading-text");
+            const duasRef = ref(database, "duas");
+
+            duaListDiv.innerHTML = "";
+            loadingText.style.display = "block";
+
+            onValue(duasRef, (snapshot) => {
+                loadingText.style.display = "none";
+                const duas = snapshot.val();
+                if (duas) {
+                    Object.entries(duas).forEach(([key, value]) => {
+                        const title = value.title || key;
+                        if (searchQuery && !title.toLowerCase().includes(searchQuery.toLowerCase())) return;
+
+                        const duaCard = document.createElement("div");
+                        duaCard.id = `dua-card-${key}`;
+                        duaCard.className = "dua-card bg-gray-800 p-4 rounded-xl shadow-lg";
+                        duaCard.innerHTML = `
+                            <h3 class="text-lg font-bold text-emerald-400 mb-2">${title}</h3>
+                            <p class="text-base">${value.content || "দোয়া পাওয়া যায়নি"}</p>
+                        `;
+                        duaListDiv.appendChild(duaCard);
+                    });
+                } else {
+                    duaListDiv.innerHTML = "<p class='text-gray-400'>কোনো দোয়া পাওয়া যায়নি</p>";
+                }
+            });
+        }
+
+        document.getElementById("search-bar").addEventListener("input", (e) => {
+            const query = e.target.value;
+            loadAllDuas(query);
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadDuaNames();
+            loadAllDuas();
+        });
+
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker.register("/sw.js").then(() => {
+                    console.log("Service Worker registered");
+                }).catch(err => {
+                    console.error("Service Worker registration failed:", err);
+                });
+            });
+        }
+    </script>
+</body>
+</html>

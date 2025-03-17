@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Islamic Life - Enhanced</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database.js"></script>
+    <link rel="manifest" href="/manifest.json">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-white min-h-screen font-sans">
+    <div class="max-w-md mx-auto p-4">
+        <header class="flex justify-between items-center mb-6 relative">
+            <div class="w-full flex items-center gap-4">
+                <select id="district" class="w-3/4 bg-gray-800 border border-emerald-500 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400">
+                    <option value="">জেলা নির্বাচন করুন</option>
+                    <option value="dhaka">ঢাকা</option>
+                    <option value="chittagong">চট্টগ্রাম</option>
+                    <option value="rajshahi">রাজশাহী</option>
+                    <option value="khulna">খুলনা</option>
+                    <option value="barisal">বরিশাল</option>
+                    <option value="sylhet">সিলেট</option>
+                    <option value="rangpur">রংপুর</option>
+                    <option value="mymensingh">ময়মনসিংহ</option>
+                    <option value="comilla">কুমিল্লা</option>
+                    <option value="faridpur">ফরিদপুর</option>
+                    <option value="gazipur">গাজীপুর</option>
+                    <option value="jessore">যশোর</option>
+                    <option value="bogra">বগুড়া</option>
+                    <option value="tangail">টাঙ্গাইল</option>
+                    <option value="dinajpur">দিনাজপুর</option>
+                    <option value="nilphamari">নীলফামারী</option>
+                </select>
+                <div id="weather" class="text-sm flex items-center gap-1">
+                    <span class="material-icons text-emerald-400">cloud</span>
+                    <span id="weather-info">লোড হচ্ছে...</span>
+                </div>
+            </div>
+            <a href="notifications.html" id="notification-btn" class="p-2 relative">
+                <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+                <span id="notification-count" class="absolute top-0 right-0 bg-red-500 text-xs rounded-full w-4 h-4 flex items-center justify-center hidden">0</span>
+            </a>
+        </header>
+
+        <div class="bg-gray-800 p-4 rounded-xl shadow-lg mb-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h3 class="text-emerald-400">হিজরি তারিখ</h3>
+                    <p id="hijri-date" class="text-lg font-bold">লোড হচ্ছে...</p>
+                </div>
+                <div class="text-right">
+                    <h3 class="text-emerald-400">ইংরেজি তারিখ</h3>
+                    <p id="gregorian-date" class="text-lg font-bold">লোড হচ্ছে...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="bg-gray-800 p-4 rounded-xl shadow-lg">
+                <h3 class="text-emerald-400">সূর্যোদয়</h3>
+                <p id="sunrise" class="text-2xl font-bold">লোড হচ্ছে...</p>
+            </div>
+            <div class="bg-gray-800 p-4 rounded-xl shadow-lg">
+                <h3 class="text-emerald-400">সূর্যাস্ত</h3>
+                <p id="sunset" class="text-2xl font-bold">লোড হচ্ছে...</p>
+            </div>
+        </div>
+
+        <div class="bg-gray-800 p-4 rounded-xl shadow-lg mb-6 relative">
+            <h2 class="text-xl font-bold text-emerald-400 mb-4">নামাজের সময়</h2>
+            <div id="prayer-times" class="space-y-3">
+                <p class="text-gray-400">লোড হচ্ছে...</p>
+            </div>
+            <button id="play-adhan" class="absolute top-4 right-4 text-emerald-400 hover:text-emerald-300">
+                <span class="material-icons">volume_up</span>
+            </button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="bg-gray-800 p-4 rounded-xl shadow-lg">
+                <h3 class="text-emerald-400">পরবর্তী সাহরী</h3>
+                <p id="sehri" class="text-lg">লোড হচ্ছে...</p>
+                <p id="sehri-countdown" class="text-sm text-gray-400"></p>
+            </div>
+            <div class="bg-gray-800 p-4 rounded-xl shadow-lg">
+                <h3 class="text-emerald-400">ইফতার</h3>
+                <p id="iftar" class="text-lg">লোড হচ্ছে...</p>
+                <p id="iftar-countdown" class="text-sm text-gray-400"></p>
+            </div>
+        </div>
+
+        <div class="bg-gray-800 p-4 rounded-xl shadow-lg mb-16">
+            <h3 class="text-emerald-400 mb-2">নামাজের নিষিদ্ধ সময়</h3>
+            <div id="forbidden-times" class="space-y-2 text-sm">
+                <p><span class="text-gray-400">ভোর:</span> <span id="forbidden-dawn">লোড হচ্ছে...</span></p>
+                <p><span class="text-gray-400">দুপুর:</span> <span id="forbidden-noon">লোড হচ্ছে...</span></p>
+                <p><span class="text-gray-400">সন্ধ্যা:</span> <span id="forbidden-evening">লোড হচ্ছে...</span></p>
+            </div>
+        </div>
+    </div>
+
+    <nav class="fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-emerald-500 py-2">
+        <div class="max-w-md mx-auto flex justify-around">
+            <a href="home.html" class="p-2 text-emerald-400 flex flex-col items-center">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5v-5l-10 5-10-5v5z" />
+                </svg>
+                <span class="text-xs">হোম</span>
+            </a>
+            <a href="calendar.html" class="p-2 text-gray-400 flex flex-col items-center">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                </svg>
+                <span class="text-xs">ক্যালেন্ডার</span>
+            </a>
+            <a href="quran.html" class="p-2 text-gray-400 flex flex-col items-center">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
+                </svg>
+                <span class="text-xs">কুরআন</span>
+            </a>
+            <a href="dua.html" class="p-2 text-gray-400 flex flex-col items-center">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
+                </svg>
+                <span class="text-xs">দোয়া</span>
+            </a>
+            <a href="menu.html" class="p-2 text-gray-400 flex flex-col items-center">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" />
+                </svg>
+                <span class="text-xs">মেনু</span>
+            </a>
+        </div>
+    </nav>
+
+    <style>
+        .bg-gray-800 {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+        }
+        .shadow-lg {
+            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.1), 0 4px 6px -2px rgba(16, 185, 129, 0.05);
+        }
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+    </style>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js";
+        import { getDatabase, ref, onValue, push } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDrfoR60PDZP1Jo3rdq9hA3i6ZSFCBnFug",
+            authDomain: "muslim-web-app.firebaseapp.com",
+            databaseURL: "https://muslim-web-app-default-rtdb.firebaseio.com",
+            projectId: "muslim-web-app",
+            storageBucket: "muslim-web-app.firebasestorage.app",
+            messagingSenderId: "575010521833",
+            appId: "1:575010521833:web:7ad541405854bf51106678",
+            measurementId: "G-MEYHG9F7E4"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const adhanAudio = new Audio('https://cdn.islamic.network/adhan.mp3');
+
+        function to12Hour(time) {
+            const [hours, minutes] = time.split(":").map(Number);
+            const period = hours >= 12 ? "PM" : "AM";
+            const hour12 = hours % 12 || 12;
+            return `${hour12}:${minutes < 10 ? "0" + minutes : minutes} ${period}`;
+        }
+
+        function getTimeDifference(targetTime, isTomorrow = false) {
+            const now = new Date();
+            const [hours, minutes] = targetTime.split(":").map(Number);
+            const target = new Date();
+            if (isTomorrow) target.setDate(target.getDate() + 1);
+            target.setHours(hours, minutes, 0, 0);
+
+            const diff = target - now;
+            if (diff < 0) return "শেষ";
+            const hoursLeft = Math.floor(diff / (1000 * 60 * 60));
+            const minutesLeft = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            return `${hoursLeft}ঘ ${minutesLeft}মি`;
+        }
+
+        async function fetchPrayerTimes(city, isTomorrow = false) {
+            try {
+                const date = new Date();
+                if (isTomorrow) date.setDate(date.getDate() + 1);
+                const response = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=Bangladesh&method=4&date=${date.toISOString().split('T')[0]}`);
+                return (await response.json()).data;
+            } catch (error) {
+                console.error("Prayer times fetch error:", error);
+                return null;
+            }
+        }
+
+        async function fetchWeather(city) {
+            const cityCoords = {
+                "dhaka": { lat: 23.8103, lon: 90.4125 },
+                "chittagong": { lat: 22.3569, lon: 91.7832 },
+                "rajshahi": { lat: 24.3745, lon: 88.6042 },
+                "khulna": { lat: 22.8456, lon: 89.5403 },
+                "barisal": { lat: 22.7010, lon: 90.3535 },
+                "sylhet": { lat: 24.8949, lon: 91.8687 },
+                "rangpur": { lat: 25.7439, lon: 89.2752 },
+                "mymensingh": { lat: 24.7471, lon: 90.4203 },
+                "comilla": { lat: 23.4683, lon: 91.1788 },
+                "faridpur": { lat: 23.6071, lon: 89.8420 },
+                "gazipur": { lat: 24.0023, lon: 90.4260 },
+                "jessore": { lat: 23.1667, lon: 89.2167 },
+                "bogra": { lat: 24.8481, lon: 89.3733 },
+                "tangail": { lat: 24.2513, lon: 89.9167 },
+                "dinajpur": { lat: 25.6279, lon: 88.6332 },
+                "nilphamari": { lat: 25.9318, lon: 88.8560 }
+            };
+            const { lat, lon } = cityCoords[city] || cityCoords["dhaka"];
+            try {
+                const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+                const data = await response.json();
+                const temp = data.current_weather.temperature;
+                const weatherCode = data.current_weather.weathercode;
+                const weatherDesc = {
+                    0: "পরিষ্কার আকাশ",
+                    1: "প্রধানত পরিষ্কার",
+                    2: "আংশিক মেঘলা",
+                    3: "মেঘলা",
+                    45: "কুয়াশা",
+                    61: "হালকা বৃষ্টি",
+                    63: "মাঝারি বৃষ্টি",
+                    65: "ভারী বৃষ্টি"
+                };
+                return `${weatherDesc[weatherCode] || "অজানা"}, ${temp}°C`;
+            } catch (error) {
+                console.error("Weather fetch error:", error);
+                return "আবহাওয়া তথ্য নেই";
+            }
+        }
+
+        function calculateForbiddenTimes(timings) {
+            const sunrise = timings.Sunrise.split(":").map(Number);
+            const sunset = timings.Sunset.split(":").map(Number);
+            const dhuhr = timings.Dhuhr.split(":").map(Number);
+
+            const dawnStart = `${sunrise[0] - 1}:${sunrise[1]}`; // Approx 1 hour before sunrise
+            const dawnEnd = timings.Sunrise;
+            const noonStart = `${dhuhr[0] - 1}:${dhuhr[1]}`; // Approx 1 hour before Dhuhr
+            const noonEnd = timings.Dhuhr;
+            const eveningStart = timings.Sunset;
+            const eveningEnd = `${sunset[0] + 1}:${sunset[1]}`; // Approx 1 hour after sunset
+
+            return {
+                dawn: `${to12Hour(dawnStart)} - ${to12Hour(dawnEnd)}`,
+                noon: `${to12Hour(noonStart)} - ${to12Hour(noonEnd)}`,
+                evening: `${to12Hour(eveningStart)} - ${to12Hour(eveningEnd)}`
+            };
+        }
+
+        async function updatePrayerTimes(city) {
+            const prayerTimesDiv = document.getElementById("prayer-times");
+            const todayData = await fetchPrayerTimes(city);
+            const tomorrowData = await fetchPrayerTimes(city, true);
+
+            if (!todayData || !tomorrowData) {
+                prayerTimesDiv.innerHTML = "<p class='text-red-500'>নামাজের সময় লোড করা যায়নি</p>";
+                return;
+            }
+
+            prayerTimesDiv.innerHTML = "";
+            const prayers = {
+                "ফজর": todayData.timings.Fajr,
+                "যোহর": todayData.timings.Dhuhr,
+                "আসর": todayData.timings.Asr,
+                "মাগরিব": todayData.timings.Maghrib,
+                "ইশা": todayData.timings.Isha
+            };
+
+            Object.entries(prayers).forEach(([prayer, time]) => {
+                const remaining = getTimeDifference(time);
+                prayerTimesDiv.innerHTML += `
+                    <div class="flex justify-between items-center hover:bg-gray-700 p-2 rounded transition">
+                        <span>${prayer}</span>
+                        <div class="text-right">
+                            <span class="text-emerald-400">${to12Hour(time)}</span>
+                            <p class="text-xs text-gray-400">${remaining}</p>
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById("sunrise").textContent = to12Hour(todayData.timings.Sunrise);
+            document.getElementById("sunset").textContent = to12Hour(todayData.timings.Sunset);
+            document.getElementById("sehri").textContent = to12Hour(tomorrowData.timings.Fajr);
+            document.getElementById("iftar").textContent = to12Hour(todayData.timings.Maghrib);
+            document.getElementById("sehri-countdown").textContent = getTimeDifference(tomorrowData.timings.Fajr, true);
+            document.getElementById("iftar-countdown").textContent = getTimeDifference(todayData.timings.Maghrib);
+            document.getElementById("hijri-date").textContent = todayData.date.hijri.date;
+            document.getElementById("gregorian-date").textContent = todayData.date.readable;
+
+            const forbiddenTimes = calculateForbiddenTimes(todayData.timings);
+            document.getElementById("forbidden-dawn").textContent = forbiddenTimes.dawn;
+            document.getElementById("forbidden-noon").textContent = forbiddenTimes.noon;
+            document.getElementById("forbidden-evening").textContent = forbiddenTimes.evening;
+        }
+
+        async function updateWeather(city) {
+            const weatherInfo = await fetchWeather(city);
+            document.getElementById("weather-info").textContent = weatherInfo;
+        }
+
+        function updateNotificationCount() {
+            const notificationCount = document.getElementById("notification-count");
+            const notificationRef = ref(database, "notifications");
+            onValue(notificationRef, (snapshot) => {
+                const notifications = snapshot.val();
+                const count = notifications ? Object.keys(notifications).length : 0;
+                notificationCount.textContent = count;
+                notificationCount.classList.toggle("hidden", count === 0);
+            }, (error) => {
+                console.error("Notification count error:", error);
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const districtSelect = document.getElementById("district");
+            let selectedCity = localStorage.getItem("selectedCity") || "dhaka";
+            districtSelect.value = selectedCity;
+
+            updatePrayerTimes(selectedCity);
+            updateWeather(selectedCity);
+            setInterval(() => {
+                updatePrayerTimes(selectedCity);
+                updateWeather(selectedCity);
+            }, 60000);
+            updateNotificationCount();
+
+            districtSelect.addEventListener("change", (e) => {
+                selectedCity = e.target.value || "dhaka";
+                localStorage.setItem("selectedCity", selectedCity);
+                updatePrayerTimes(selectedCity);
+                updateWeather(selectedCity);
+                push(ref(database, "user_settings"), {
+                    district: selectedCity,
+                    timestamp: new Date().toISOString()
+                });
+            });
+
+            document.getElementById("play-adhan").addEventListener("click", () => {
+                adhanAudio.play().catch(error => console.error("Adhan playback error:", error));
+            });
+        });
+
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker.register("/sw.js").then(() => {
+                    console.log("Service Worker registered");
+                }).catch(err => {
+                    console.error("Service Worker registration failed:", err);
+                });
+            });
+        }
+    </script>
+</body>
+</html>

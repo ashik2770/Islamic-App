@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#111827">
+    <meta name="description" content="Islamic Life - দোয়া সমূহ">
+    <title>Islamic Life - দোয়া</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/favicon.ico">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: 'Uthmani';
+            src: url('https://cdn.jsdelivr.net/npm/quran-fonts@1.0.0/fonts/uthmani.woff2') format('woff2');
+        }
+        .arabic-text {
+            font-family: 'Uthmani', serif;
+            font-size: 1.5rem;
+            line-height: 2;
+            direction: rtl;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen font-sans">
+    <div class="max-w-md mx-auto p-4">
+        <header class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold text-emerald-400">দোয়া</h1>
+            <div class="flex items-center gap-2">
+                <select id="category-filter" class="bg-gray-800 border border-emerald-500 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400">
+                    <option value="">সব বিভাগ</option>
+                    <option value="daily">প্রতিদিনের দোয়া</option>
+                    <option value="prayer">নামাজের দোয়া</option>
+                    <option value="special">বিশেষ দোয়া</option>
+                </select>
+                <a href="notifications.html" id="notification-btn" class="p-2 relative">
+                    <span class="material-icons text-emerald-400">notifications</span>
+                    <span id="notification-count" class="absolute top-0 right-0 bg-red-500 text-xs rounded-full w-4 h-4 flex items-center justify-center hidden">0</span>
+                </a>
+            </div>
+        </header>
+
+        <div class="mb-6 relative">
+            <input type="text" id="search-bar" placeholder="দোয়া খুঁজুন..." class="w-full bg-gray-800 border border-emerald-500 rounded-lg p-2 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all duration-300">
+            <span class="material-icons text-emerald-400 absolute left-3 top-1/2 transform -translate-y-1/2">search</span>
+        </div>
+
+        <div id="dua-list" class="space-y-2 mb-24 min-h-[50vh]">
+            <p id="loading-text" class="text-gray-400 text-center hidden">লোড হচ্ছে...</p>
+        </div>
+
+        <div id="audio-player" class="fixed bottom-16 left-0 right-0 bg-gray-800 border-t border-emerald-500 p-4 max-w-md mx-auto rounded-t-xl shadow-lg hidden">
+            <div class="flex justify-between items-center mb-2">
+                <div>
+                    <p id="dua-title" class="text-emerald-400 font-bold">দোয়া নির্বাচন করুন</p>
+                    <p id="dua-info" class="text-sm text-gray-400">তথ্য লোড হচ্ছে...</p>
+                </div>
+                <button id="close-player" class="text-gray-400 hover:text-emerald-400">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+            <div class="relative w-full bg-gray-700 h-1 rounded-full mb-4">
+                <div id="progress-bar" class="absolute bg-emerald-400 h-1 rounded-full" style="width: 0%"></div>
+            </div>
+            <div class="flex justify-between items-center">
+                <button id="play-pause" class="text-emerald-400 hover:text-emerald-600">
+                    <span id="play-icon" class="material-icons">play_arrow</span>
+                    <span id="pause-icon" class="material-icons hidden">pause</span>
+                </button>
+                <div class="flex items-center gap-2">
+                    <span class="material-icons text-emerald-400">volume_up</span>
+                    <input id="volume-control" type="range" min="0" max="1" step="0.1" value="1" class="w-20 accent-emerald-400">
+                </div>
+            </div>
+            <p id="audio-error" class="text-red-500 text-sm mt-2 hidden">অডিও চালাতে ত্রুটি হয়েছে</p>
+        </div>
+    </div>
+
+    <nav class="fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-emerald-500 py-2">
+        <div class="max-w-md mx-auto flex justify-around">
+            <a href="home.html" class="p-2 text-gray-400 hover:text-emerald-400 transition-colors flex flex-col items-center">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5v-5l-10 5-10-5v5z" /></svg>
+                <span class="text-xs">হোম</span>
+            </a>
+            <a href="calendar.html" class="p-2 text-gray-400 hover:text-emerald-400 transition-colors flex flex-col items-center">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" /></svg>
+                <span class="text-xs">ক্যালেন্ডার</span>
+            </a>
+            <a href="quran.html" class="p-2 text-gray-400 hover:text-emerald-400 transition-colors flex flex-col items-center">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" /></svg>
+                <span class="text-xs">কুরআন</span>
+            </a>
+            <a href="dua.html" class="p-2 text-emerald-400 flex flex-col items-center">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" /></svg>
+                <span class="text-xs">দোয়া</span>
+            </a>
+            <a href="menu.html" class="p-2 text-gray-400 hover:text-emerald-400 transition-colors flex flex-col items-center">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" /></svg>
+                <span class="text-xs">মেনু</span>
+            </a>
+        </div>
+    </nav>
+
+    <style>
+        .bg-gray-800 {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+        }
+        .shadow-lg {
+            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.1), 0 4px 6px -2px rgba(16, 185, 129, 0.05);
+        }
+        .dua-card {
+            transition: all 0.2s ease-in-out;
+        }
+        .dua-card:hover {
+            background-color: #2d3748;
+            transform: translateY(-2px);
+        }
+        .dua-content {
+            background-color: #1f2937;
+            border-radius: 0 0 0.75rem 0.75rem;
+            margin-top: 0.5rem;
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease-in-out;
+        }
+        .dua-content.show {
+            opacity: 1;
+            max-height: 600px;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDrfoR60PDZP1Jo3rdq9hA3i6ZSFCBnFug",
+            authDomain: "muslim-web-app.firebaseapp.com",
+            databaseURL: "https://muslim-web-app-default-rtdb.firebaseio.com",
+            projectId: "muslim-web-app",
+            storageBucket: "muslim-web-app.firebasestorage.app",
+            messagingSenderId: "575010521833",
+            appId: "1:575010521833:web:7ad541405854bf51106678",
+            measurementId: "G-MEYHG9F7E4"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        let selectedDua = null;
+        let audioElement = null;
+
+        function showLoading(show) {
+            const loadingText = document.getElementById("loading-text");
+            if (loadingText) loadingText.classList.toggle("hidden", !show);
+        }
+
+        function loadAllDuas(searchQuery = "", category = "") {
+            const duaListDiv = document.getElementById("dua-list");
+            if (!duaListDiv) return;
+
+            duaListDiv.innerHTML = "";
+            showLoading(true);
+
+            const duasRef = ref(database, "duas");
+            onValue(duasRef, (snapshot) => {
+                showLoading(false);
+                const duas = snapshot.val();
+
+                if (!duas) {
+                    duaListDiv.innerHTML = "<p class='text-gray-400 text-center py-4'>কোনো দোয়া পাওয়া যায়নি</p>";
+                    return;
+                }
+
+                Object.entries(duas).forEach(([key, value]) => {
+                    const title = value.title || key;
+                    const matchesSearch = !searchQuery || title.toLowerCase().includes(searchQuery.toLowerCase());
+                    const matchesCategory = !category || value.category === category;
+
+                    if (matchesSearch && matchesCategory) {
+                        const duaCard = document.createElement("div");
+                        duaCard.id = `dua-card-${key}`;
+                        duaCard.className = "dua-card bg-gray-800 p-3 rounded-xl shadow-lg cursor-pointer";
+
+                        const titleDiv = document.createElement("div");
+                        titleDiv.className = "text-base font-semibold text-emerald-400 flex justify-between items-center";
+                        titleDiv.innerHTML = `
+                            <span>${title}</span>
+                            <div class="flex gap-2">
+                                ${value.audio ? `<button class="play-audio text-emerald-400 hover:text-emerald-300" data-audio="${value.audio}"><span class="material-icons">play_circle</span></button>` : ''}
+                                <span class="arrow material-icons transform transition-transform duration-300">expand_more</span>
+                            </div>
+                        `;
+
+                        const contentDiv = document.createElement("div");
+                        contentDiv.id = `content-${key}`;
+                        contentDiv.className = "dua-content p-3 text-base";
+                        contentDiv.innerHTML = `
+                            <p class="arabic-text">${value.arabic || "عربي غير متوفر"}</p>
+                            <p class="mt-2">${value.content || "দোয়া পাওয়া যায়নি"}</p>
+                            ${value.translation ? `<p class="text-gray-400 mt-2">অনুবাদ: ${value.translation}</p>` : ''}
+                        `;
+
+                        duaCard.appendChild(titleDiv);
+                        duaCard.appendChild(contentDiv);
+                        duaListDiv.appendChild(duaCard);
+
+                        duaCard.addEventListener("click", (e) => {
+                            if (e.target.closest('.play-audio')) return;
+
+                            if (selectedDua && selectedDua !== contentDiv) {
+                                selectedDua.classList.remove("show");
+                                selectedDua.previousElementSibling.querySelector(".arrow").textContent = "expand_more";
+                            }
+
+                            contentDiv.classList.toggle("show");
+                            const arrow = titleDiv.querySelector(".arrow");
+                            arrow.textContent = contentDiv.classList.contains("show") ? "expand_less" : "expand_more";
+
+                            selectedDua = contentDiv.classList.contains("show") ? contentDiv : null;
+                            if (selectedDua) {
+                                window.scrollTo({ top: duaCard.offsetTop - 20, behavior: "smooth" });
+                            }
+                        });
+
+                        if (value.audio) {
+                            titleDiv.querySelector(".play-audio").addEventListener("click", () => playDuaAudio(value.audio, title));
+                        }
+                    }
+                });
+
+                if (!duaListDiv.children.length) {
+                    duaListDiv.innerHTML = "<p class='text-gray-400 text-center py-4'>কোনো দোয়া মিলছে না</p>";
+                }
+            }, (error) => {
+                showLoading(false);
+                duaListDiv.innerHTML = "<p class='text-red-400 text-center py-4'>ত্রুটি: দোয়া লোড করা যায়নি</p>";
+                console.error("Firebase error:", error);
+            });
+        }
+
+        function playDuaAudio(audioUrl, title) {
+            const audioPlayer = document.getElementById("audio-player");
+            if (!audioElement) {
+                audioElement = new Audio();
+                audioElement.id = "dua-audio";
+                document.body.appendChild(audioElement);
+            }
+            const duaTitle = document.getElementById("dua-title");
+            const duaInfo = document.getElementById("dua-info");
+            const progressBar = document.getElementById("progress-bar");
+            const playPauseBtn = document.getElementById("play-pause");
+            const playIcon = document.getElementById("play-icon");
+            const pauseIcon = document.getElementById("pause-icon");
+            const audioError = document.getElementById("audio-error");
+
+            duaTitle.textContent = title;
+            duaInfo.textContent = "অডিও চলছে...";
+            audioElement.src = audioUrl;
+            audioPlayer.classList.remove("hidden");
+            audioError.classList.add("hidden");
+
+            audioElement.play().catch(() => audioError.classList.remove("hidden"));
+            playIcon.classList.add("hidden");
+            pauseIcon.classList.remove("hidden");
+
+            audioElement.ontimeupdate = () => {
+                if (audioElement.duration) {
+                    const progress = (audioElement.currentTime / audioElement.duration) * 100;
+                    progressBar.style.width = `${progress}%`;
+                }
+            };
+
+            audioElement.onended = () => {
+                audioPlayer.classList.add("hidden");
+                playIcon.classList.remove("hidden");
+                pauseIcon.classList.add("hidden");
+            };
+
+            playPauseBtn.onclick = () => {
+                if (audioElement.paused) {
+                    audioElement.play().catch(() => audioError.classList.remove("hidden"));
+                    playIcon.classList.add("hidden");
+                    pauseIcon.classList.remove("hidden");
+                } else {
+                    audioElement.pause();
+                    playIcon.classList.remove("hidden");
+                    pauseIcon.classList.add("hidden");
+                }
+            };
+        }
+
+        function setupSearchAndFilter() {
+            const searchBar = document.getElementById("search-bar");
+            const categoryFilter = document.getElementById("category-filter");
+            if (!searchBar || !categoryFilter) return;
+
+            searchBar.value = "";
+            let currentQuery = "";
+            let currentCategory = "";
+
+            searchBar.addEventListener("input", (e) => {
+                currentQuery = e.target.value.trim();
+                loadAllDuas(currentQuery, currentCategory);
+            });
+
+            searchBar.addEventListener("keypress", (e) => {
+                if (e.key === "Enter") loadAllDuas(searchBar.value.trim(), currentCategory);
+            });
+
+            categoryFilter.addEventListener("change", (e) => {
+                currentCategory = e.target.value;
+                loadAllDuas(currentQuery, currentCategory);
+            });
+        }
+
+        function updateNotificationCount() {
+            const notificationCount = document.getElementById("notification-count");
+            const notificationRef = ref(database, "notifications");
+            onValue(notificationRef, (snapshot) => {
+                const notifications = snapshot.val();
+                const count = notifications ? Object.keys(notifications).length : 0;
+                notificationCount.textContent = count;
+                notificationCount.classList.toggle("hidden", count === 0);
+            }, (error) => console.error("Notification count error:", error));
+        }
+
+        document.getElementById("close-player").addEventListener("click", () => {
+            const audioPlayer = document.getElementById("audio-player");
+            if (audioElement) {
+                audioElement.pause();
+                audioPlayer.classList.add("hidden");
+            }
+        });
+
+        document.getElementById("volume-control").addEventListener("input", (e) => {
+            if (audioElement) audioElement.volume = e.target.value;
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
+            setupSearchAndFilter();
+            loadAllDuas();
+            updateNotificationCount();
+        });
+
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker.register("/sw.js")
+                    .then(() => console.log("Service Worker registered"))
+                    .catch(err => console.error("Service Worker registration failed:", err));
+            });
+        }
+    </script>
+</body>
+</html>

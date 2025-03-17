@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - Islamic Life</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen font-sans overflow-hidden">
+    <div class="max-w-md mx-auto p-4 relative">
+        <header class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-bold text-emerald-400 flex items-center">
+                <svg class="w-8 h-8 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+                নোটিফিকেশন
+            </h1>
+            <a href="home.html" class="text-emerald-400 hover:text-emerald-300 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+            </a>
+        </header>
+
+        <div class="mb-4">
+            <input type="text" id="search-notifications" placeholder="নোটিফিকেশন খুঁজুন..." 
+                   class="w-full p-2 rounded-lg bg-gray-800 text-white border border-gray-700 focus:outline-none focus:border-emerald-400">
+        </div>
+
+        <div id="notification-list" class="space-y-4 max-h-[65vh] overflow-y-auto scrollbar-thin scrollbar-thumb-emerald-400 scrollbar-track-gray-800">
+            <p class="text-gray-400 text-center">লোড হচ্ছে...</p>
+        </div>
+
+        <button id="clear-notifications" class="mt-6 w-full bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center disabled:bg-red-400" disabled>
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            সব মুছুন
+        </button>
+    </div>
+
+    <div class="absolute inset-0 pointer-events-none">
+        <div class="particle particle-1"></div>
+        <div class="particle particle-2"></div>
+        <div class="particle particle-3"></div>
+    </div>
+
+    <style>
+        .bg-gray-800 {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+        }
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(167, 243, 208, 0.5);
+            border-radius: 50%;
+            animation: float 5s infinite ease-in-out;
+        }
+        .particle-1 { top: 20%; left: 10%; animation-delay: 0s; }
+        .particle-2 { top: 70%; left: 80%; animation-delay: 1s; }
+        .particle-3 { top: 40%; left: 60%; animation-delay: 2s; }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); opacity: 0.5; }
+            50% { transform: translateY(-50px); opacity: 1; }
+        }
+        .scrollbar-thin::-webkit-scrollbar {
+            width: 8px;
+        }
+        .scrollbar-thumb-emerald-400::-webkit-scrollbar-thumb {
+            background-color: #34d399;
+            border-radius: 4px;
+        }
+        .scrollbar-track-gray-800::-webkit-scrollbar-track {
+            background-color: #1f2937;
+        }
+    </style>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+        import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDrfoR60PDZP1Jo3rdq9hA3i6ZSFCBnFug",
+            authDomain: "muslim-web-app.firebaseapp.com",
+            databaseURL: "https://muslim-web-app-default-rtdb.firebaseio.com",
+            projectId: "muslim-web-app",
+            storageBucket: "muslim-web-app.firebasestorage.app",
+            messagingSenderId: "575010521833",
+            appId: "1:575010521833:web:7ad541405854bf51106678",
+            measurementId: "G-MEYHG9F7E4"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const notificationList = document.getElementById("notification-list");
+        const clearBtn = document.getElementById("clear-notifications");
+        const searchInput = document.getElementById("search-notifications");
+        let allNotifications = [];
+
+        async function loadNotifications() {
+            try {
+                const notificationRef = ref(database, "notifications");
+                onValue(notificationRef, (snapshot) => {
+                    allNotifications = [];
+                    notificationList.innerHTML = "";
+                    const notifications = snapshot.val();
+
+                    if (notifications) {
+                        allNotifications = Object.entries(notifications).map(([id, notif]) => ({ id, ...notif }));
+                        renderNotifications(allNotifications);
+                        clearBtn.disabled = false;
+                    } else {
+                        showEmptyState();
+                        clearBtn.disabled = true;
+                    }
+                }, {
+                    onlyOnce: false
+                });
+            } catch (error) {
+                notificationList.innerHTML = `<p class="text-red-500 text-center">ত্রুটি: ${error.message}</p>`;
+            }
+        }
+
+        function renderNotifications(notifs) {
+            notificationList.innerHTML = "";
+            notifs.forEach(notif => {
+                const div = document.createElement("div");
+                div.className = "bg-gray-800 p-4 rounded-xl shadow-lg flex items-start space-x-3 hover:bg-gray-700 transition-colors";
+                div.innerHTML = `
+                    <svg class="w-6 h-6 text-emerald-400 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
+                    </svg>
+                    <div class="flex-1">
+                        <p class="text-emerald-300">${notif.message}</p>
+                        <p class="text-xs text-gray-400">${new Date(notif.timestamp).toLocaleString("bn-BD")}</p>
+                    </div>
+                `;
+                notificationList.appendChild(div);
+            });
+        }
+
+        function showEmptyState() {
+            notificationList.innerHTML = `
+                <div class="text-center text-gray-400 py-8">
+                    <svg class="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
+                    </svg>
+                    কোনো নোটিফিকেশন নেই।
+                </div>
+            `;
+        }
+
+        searchInput.addEventListener("input", (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filtered = allNotifications.filter(notif => 
+                notif.message.toLowerCase().includes(searchTerm)
+            );
+            if (filtered.length > 0) {
+                renderNotifications(filtered);
+            } else {
+                notificationList.innerHTML = `<p class="text-gray-400 text-center py-8">কোনো ফলাফল পাওয়া যায়নি।</p>`;
+            }
+        });
+
+        clearBtn.addEventListener("click", async () => {
+            if (confirm("আপনি কি সত্যিই সব নোটিফিকেশন মুছে ফেলতে চান?")) {
+                try {
+                    await remove(ref(database, "notifications"));
+                    allNotifications = [];
+                    showEmptyState();
+                    clearBtn.disabled = true;
+                } catch (error) {
+                    alert("মুছে ফেলতে ত্রুটি: " + error.message);
+                }
+            }
+        });
+
+        document.addEventListener("DOMContentLoaded", loadNotifications);
+
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker.register("/sw.js")
+                    .then(() => console.log("Service Worker registered"))
+                    .catch(err => console.error("Service Worker registration failed:", err));
+            });
+        }
+    </script>
+</body>
+</html>
